@@ -5,7 +5,7 @@
 
 % Initialize the Basic Parameters: number of molecules of A (N), max # of reactions (T) , state vector (X), proportion bound over time (A), Reaction Coeffecients (k_bind, k_unbind) L is the length of the 1D representation of the membrane of a cell.
 
-N = 100; T = 4000; k_bind = 0.1; k_unbind = 0.5; k_feedback = 0.3; L = 10; v_x = 0.01;
+N = 100; T = 4000; k_bind = 0.1; k_unbind = 0.9; k_feedback = 1; L = 10; v_x = 0.05;
 
 % X(1,:) is a bool representing whether each particle is bound or not.
 % X(2,:) is a float representing the position of each particle.
@@ -50,9 +50,6 @@ for i = 2:(T+1)
 		X(1,unbound_index,i) = 1;
 		X(2,unbound_index,i) = X(2,bound_index,i);
 	end
-
-
-
 		for n = 1:N
 			switch X(1,n,i)
 				case 0
@@ -66,36 +63,36 @@ for i = 2:(T+1)
 end
 
 % The steady state  f the concentration for the ODE version of this is:
-a_steady_state = (k_bind / (k_bind + k_unbind));
+%a_steady_state = (k_bind / (k_bind + k_unbind));
 
 
 %Setting up the ODE to plot
-[t, a] =  ode45(@(t, a) k_bind * (1 - a) - k_unbind * a, [0, A(2,T)], A(1,1));
+%[t, a] =  ode45(@(t, a) k_bind * (1 - a) - k_unbind * a, [0, A(2,T)], A(1,1));
 
-subplot(1,3,1);
+%subplot(1,3,1);
 %ODE plot
-plot(t,a); hold on;
+%plot(t,a); hold on;
 
 %Stochastic Plot
-plot(A(2,:),A(1,:));
+%plot(A(2,:),A(1,:));
 
 %Steady state comparison
-yline(a_steady_state);
+%yline(a_steady_state);
 
 %Title and labels
-title('Simple Binding-Unbinding Model w/ ODE Comparison');
-xlabel('Time');
-ylabel('Bound Proportion of Chemical A');
+%title('Simple Binding-Unbinding Model w/ ODE Comparison');
+%xlabel('Time');
+%ylabel('Bound Proportion of Chemical A');
 
 %Plotting a histogram of particle location
-subplot(1,3,2);
-hist(X(2,:,T),20);
+%subplot(1,3,2);
+%hist(X(2,:,T),20);
 
-title('Histogram of Particle Position at the Ending Time');
-xlabel('Position of Particles');
-ylabel('Number of Particles');
+%title('Histogram of Particle Position at the Ending Time');
+%xlabel('Position of Particles');
+%ylabel('Number of Particles');
 
-subplot(1,3,3);
+%subplot(1,3,3);
 
 for n = 1:N
 	scatter(A(2,:),X(2,n,:),"c",".");

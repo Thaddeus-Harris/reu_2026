@@ -85,6 +85,7 @@ hist(X(2,:,T),20);
 title('Histogram of Particle Position at the Ending Time');
 xlabel('Position of Particles');
 ylabel('Number of Particles');
+<<<<<<< HEAD
 
 subplot(1,3,3);
 
@@ -95,3 +96,8 @@ end
 title('Particle Trajectory');
 ylabel('X Position');
 xlabel = ('time');
+=======
+subplot(1,3,3);
+X_posn = X(2,:,:)
+scatter(X_posn(:,:), X(
+>>>>>>> 855e735 (...)
