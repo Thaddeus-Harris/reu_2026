@@ -5,12 +5,12 @@
 
 % Initialize the Basic Parameters: number of molecules of A (N), max # of reactions (T) , state vector (X), proportion bound over time (A), Reaction Coeffecients (k_bind, k_unbind) L is the length of the 1D representation of the membrane of a cell.
 
-N = 100; T = 1000; k_bind = 0.5; k_unbind = 0.4; L = 1; v_x = 0.01;
+N = 100; T = 1000; k_bind = 0.5; k_unbind = 0.4; L = 10; v_x = 0.01;
 
 % X(1,:) is a bool representing whether each particle is bound or not.
 % X(2,:) is a float representing the position of each particle.
 X(1,:,:) = zeros(1,N,T);
-X(2,:,1) = rand(L, N);
+X(2,:,1) = (L * rand(1, N));
 % A(1, :) is a float representing the proportion of chemical A that is bound.
 % A(2, :) is the time that this value is recorded.
 A = zeros(2,T);
@@ -63,7 +63,7 @@ a_steady_state = (k_bind / (k_bind + k_unbind));
 %Setting up the ODE to plot
 [t, a] =  ode45(@(t, a) k_bind * (1 - a) - k_unbind * a, [0, A(2,T)], A(1,1));
 
-subplot(1,2,1);
+subplot(1,3,1);
 %ODE plot
 plot(t,a); hold on;
 
@@ -79,9 +79,19 @@ xlabel('Time');
 ylabel('Bound Proportion of Chemical A');
 
 %Plotting a histogram of particle location
-subplot(1,2,2);
+subplot(1,3,2);
 hist(X(2,:,T),20);
 
 title('Histogram of Particle Position at the Ending Time');
 xlabel('Position of Particles');
 ylabel('Number of Particles');
+
+subplot(1,3,3);
+
+for n = 1:N
+	scatter(A(2,:),X(2,n,:),"c",".");
+	hold on;
+end
+title('Particle Trajectory');
+ylabel('X Position');
+xlabel = ('time');
