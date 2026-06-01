@@ -5,7 +5,7 @@
 
 N = 100; % The number of molecules
 T = 8000; % Number of reactions
-k_bind = 0.000001; % Binding rate constant
+k_bind = 0.0001; % Binding rate constant
 k_unbind = 0.9; % Unbinding rate constant
 k_feedback = 1.0; % Feedback rate constant
 L = 1; % Length of cell membrane
@@ -21,14 +21,13 @@ X(2,:,1) = (L * rand(1, N));
 % A(1, :) is a float representing the proportion of chemical A that is bound.
 % A(2, :) is the time that this value is recorded.
 A = zeros(2,T);
-tic
 W_1 = rand(1,T+1);
 W_2 = rand(1,T+1);
 % This odd index is due to using i-1 to gather the value of the last index in each of the arrays, and I didn't want to add a switch statement every time for i = 1. This is more computationally efficient
 for i = 2:(T+1)
-
 	% set the position to the position of the previous time.
-	X(:,:,i) = X(:,:,i-1);
+	X(1,:,i) = X(1,:,i-1);
+	X(2,:,i) = X(2,:,i-1);
 
 	% Setting the rates at the start of each loop
 	r_bind = k_bind*(N-sum(X(1,:,i)));
@@ -64,15 +63,21 @@ for i = 2:(T+1)
 	% Creates masks for bound & unbound values
 	unbound = (X(1,:,i) == 0);
 	bound = (X(1,:,i) == 0);
-
 	X(2,unbound,i) = X(2,unbound,i-1);
-	random_steps = ((2 * randi(2, 1, length(X(2,bound,i)))) - 3) * v_x * tau;
+	random_steps = ((2 * randi(2, 1, length(X(2,bound,i)))) - 3) * v_x * (X(1,1,i) - X(1,1,i-1));
 	X(2,bound,i) = mod(X(2,bound,i-1) + random_steps, L);
 
 	% Updating proportion and time for A
 	A(:, i) = [(sum(X(1, :,i)) / N), (A(2, i-1) + tau)];
 end
-toc
+%for i = 2:(T+1)
+	% Creates masks for bound & unbound values
+%	unbound = (X(1,:,i) == 0);
+%	bound = (X(1,:,i) == 0);
+%	X(2,unbound,i) = X(2,unbound,i-1);
+%	random_steps = ((2 * randi(2, 1, length(X(2,bound,i)))) - 3) * v_x * (X(1,1,i) - X(1,1,i-1));
+%	X(2,bound,i) = mod(X(2,bound,i-1) + random_steps, L);
+%end
 
 % The steady state  f the concentration for the ODE version of this is:
 a_steady_state = 1 - (k_unbind/k_feedback);
