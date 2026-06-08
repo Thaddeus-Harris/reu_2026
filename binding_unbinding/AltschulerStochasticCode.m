@@ -75,7 +75,7 @@ tic
 %for i=1:5
 for i=1:totalrxns
     K = X(i);
-    
+    pos(1:K, 1) = sort(pos(1:K, 1));
     % Between reactions, perform Brownian motion with periodic BC
     while(t*dt<T(i+1) && t<Nt)
         r = rand(K,1);    % coin flip
@@ -105,7 +105,8 @@ for i=1:totalrxns
     elseif(X(i+1)>K && i<totalrxns)                 % association event (on or recruitment)
         rr = rand(1,1); 
         id = randi([1,K],1);
-        pos(K+1,t) = pos(K+1,t)+(rr<pon)*L*rand(1,1);   % on event
+        pos(K+1,t) = pos(K+1,t)+(rr<pon)*0.5*sum(pos(id:id+1));   % on event
+        %pos(K+1,t) = pos(K+1,t)+(rr<pon)*L*rand(1,1);   % on event
         pos(K+1,t) = pos(K+1,t)+(rr>=pon)*pos(id,t);    % recruitment event
         n(K+1,t) = 1;
     end
