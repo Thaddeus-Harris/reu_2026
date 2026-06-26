@@ -3,19 +3,22 @@
 % rates: r_bind = k_bind * (1-a)
 % 			 r_unbind = k_unbind * a
 
-N_x = 1500; % The number of molecules
+N_x = 2000; % The number of molecules
 N_x_starting_bound = N_x/10; % The number of molecules
-N_y = 1500; % The number of molecules
+N_y = 2000; % The number of molecules
 N_y_starting_bound = N_y/10; % The number of molecules
-T = 20000; % Number of reactions
-k_bind = 0.1; % Binding rate constant
-k_unbind = 0.9; % Unbinding rate constant
-k_feedback = 1.0; % Feedback rate constant
+T =5000; % Number of reactions
+k_bind_x = 0.1; % Binding rate constant
+k_unbind_x = 0.3; % Unbinding rate constant
+k_feedback_x = 1.0; % Feedback rate constant
+k_bind_y = 0.001; % Binding rate constant
+k_unbind_y = 0.3; % Unbinding rate constant
+k_feedback_y = 1.0; % Feedback rate constant
 L = 0.1; % Length of cell membrane
 D = 0.02; % Velocity for random walk
 v_r = 0.02; % Velocity for PK Process
 lambda = 1;
-r_particle = L/50;
+r_particle = (L/50)^2;
 % X(1,:,t) is a bool representing whether each particle is bound or not.
 X = zeros(5,N_x,T);
 Y = zeros(5,N_y,T);
@@ -29,7 +32,8 @@ X(2:3,1:N_x_starting_bound,1) = (L * rand(2,N_x_starting_bound));
 %X(2:3,1:N_x_starting_bound,1) = L/2;
 X(2:3,N_x_starting_bound+1:N_x,1) = nan;
 Y(2:3,1:N_y_starting_bound,1) = (L * rand(2,N_y_starting_bound));
-%Y(2:3,1:N_y_starting_bound,1) = L/2;
+%Y(2,1:N_y_starting_bound,1) = 11*L/20;
+%Y(3,1:N_y_starting_bound,1) = L/2;
 Y(2:3,N_y_starting_bound+1:N_y,1) = nan;
 
 X(2:3,:,2) = X(2:3,:,1);
@@ -65,12 +69,12 @@ for i = 2:T
 	Y(4,:,i) = Y(4,:,i-1);
 	Y(5,:,i) = Y(5,:,i-1);
 	% Setting the rates at the start of each loop
-	r_bind_x = k_bind*(N_x-sum(X(1,:,i)));
-	r_unbind_x = k_unbind*sum(X(1,:,i));
-	r_feedback_x = k_feedback*A(1,i-1)*(N_x - sum(X(1,:,i)));
-	r_bind_y = k_bind*(N_y-sum(Y(1,:,i)));
-	r_unbind_y = k_unbind*sum(Y(1,:,i));
-	r_feedback_y = k_feedback*B(1,i-1)*(N_y - sum(Y(1,:,i)));
+	r_bind_x = k_bind_x*(N_x-sum(X(1,:,i)));
+	r_unbind_x = k_unbind_x*sum(X(1,:,i));
+	r_feedback_x = k_feedback_x*A(1,i-1)*(N_x - sum(X(1,:,i)));
+	r_bind_y = k_bind_y*(N_y-sum(Y(1,:,i)));
+	r_unbind_y = k_unbind_y*sum(Y(1,:,i));
+	r_feedback_y = k_feedback_y*B(1,i-1)*(N_y - sum(Y(1,:,i)));
 	rates = [r_bind_x, r_unbind_x,r_feedback_x, r_bind_y,r_unbind_y,r_feedback_y];
 	r_sum = sum(rates);
 
@@ -178,6 +182,8 @@ for i = 2:T
 
 	Y(2,:,i+1) = Y(2,:,i); 
 	Y(3,:,i+1) = Y(3,:,i); 
+
+	% Steric Repulsion
 	x_bound = find(X(1,:,i) == 1);   % global indices of bound X particles
 	y_bound = find(Y(1,:,i) == 1);   % global indices of bound Y particles
 
@@ -187,35 +193,37 @@ for i = 2:T
 	% --- cross-species: X against Y ---
 	dx = xp(1,:).' - yp(1,:);
 	dy = xp(2,:).' - yp(2,:);
-	distXY = sqrt(dx.^2 + dy.^2);
+	distXY = dx.^2 + dy.^2;
 	[lxi_xy, lyi_xy] = find(distXY < r_particle);
 
 	% --- same-species: X against X ---
-	dxx = xp(1,:).' - xp(1,:);
-	dyy = xp(2,:).' - xp(2,:);
-	distXX = sqrt(dxx.^2 + dyy.^2);
-	distXX(1:numel(x_bound)+1:end) = Inf;   % exclude each particle vs itself
-	[lxa, lxb] = find(distXX < r_particle);
+	%dxx = xp(1,:).' - xp(1,:);
+	%dyy = xp(2,:).' - xp(2,:);
+	%distXX = sqrt(dxx.^2 + dyy.^2);
+	%distXX(1:numel(x_bound)+1:end) = Inf;   % exclude each particle vs itself
+	%[lxa, lxb] = find(distXX < r_particle);
 
 	% --- same-species: Y against Y ---
-	dvx = yp(1,:).' - yp(1,:);
-	dvy = yp(2,:).' - yp(2,:);
-	distYY = sqrt(dvx.^2 + dvy.^2);
-	distYY(1:numel(y_bound)+1:end) = Inf;   % exclude each particle vs itself
-	[lya, lyb] = find(distYY < r_particle);
+	%dvx = yp(1,:).' - yp(1,:);
+	%dvy = yp(2,:).' - yp(2,:);
+	%distYY = sqrt(dvx.^2 + dvy.^2);
+	%distYY(1:numel(y_bound)+1:end) = Inf;   % exclude each particle vs itself
+	%[lya, lyb] = find(distYY < r_particle);
 
 	% --- map local (bound-list) indices back to global indices, then revert ---
-	X_collide = x_bound(unique([lxi_xy; lxa; lxb]));
-	Y_collide = y_bound(unique([lyi_xy; lya; lyb]));
+	X_collide = x_bound(unique([lxi_xy;]));
+	Y_collide = y_bound(unique([lyi_xy;]));
 
-	X(2:3, X_collide, i+1) = X(2:3, X_collide, i-1);
-	Y(2:3, Y_collide, i+1) = Y(2:3, Y_collide, i-1);
+	X(2:3, X_collide, i) = X(2:3, X_collide, i-1);
+	Y(2:3, Y_collide, i) = Y(2:3, Y_collide, i-1);
+	X(4:5, X_collide, i) = X(4:5, X_collide, i) / 2 ;
+	Y(4:5, Y_collide, i) = Y(4:5, Y_collide, i) / 2;
 	% Updating proportion and time for A
 
 	A(:, i) = [(sum(X(1, :,i)) / N_x), (A(2, i-1) + tau)];
 	B(:, i) = [(sum(Y(1, :,i)) / N_y), (B(2, i-1) + tau)];
 	if mod(i,100) == 0
-        fprintf('step %d / %d\n', i, T+1);
+        fprintf('step %d / %d\n', i, T);
     end
 
 end
@@ -223,7 +231,7 @@ profile off;
 profshow(profile('info'), 20);
 
 % The steady state  f the concentration for the ODE version of this is:
-a_steady_state = 1 - (k_unbind/k_feedback);
+%a_steady_state = 1 - (k_unbind/k_feedback);
 
 
 %Setting up the ODE to plot

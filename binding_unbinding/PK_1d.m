@@ -248,6 +248,7 @@ tic
 for n = 1:N
 	hold on;
 	scatter(A(2,:),X(2,n,:),"y",".");
+	set(gcf,'InvertHardcopy', 'off');
 	set(gca,'Color','k');
 	box on; grid on; 
 end

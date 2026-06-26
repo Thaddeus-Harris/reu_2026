@@ -33,6 +33,8 @@ Y(2:3,N_y_starting_bound+1:N_y,1) = nan;
 
 X(4,:,1) = cos(rand(1,N_x) * 2 * pi) * v_r;
 X(5,:,1) = sin(rand(1,N_y) * 2 * pi) * v_r;
+%X(4,:,1) = 0.1;
+%X(5,:,1) = 0;
 
 % A(1, :) is a float representing the proportion of chemical X that is bound.
 % A(2, :) is the time that this value is recorded.
@@ -210,14 +212,32 @@ a_steady_state = 1 - (k_unbind/k_feedback);
 ylabel('Y Position');
 xlabel = ('X Position');
 
-for t = 1:20:T
-  title(['Particle Position: ',num2str(t)]);
-	scatter(X(2,:,t),X(3,:,t),250,"m",".");
-	set(gca,'Color','k');
-	hold on;
-	scatter(Y(2,:,t),Y(3,:,t),250,"c",".");
-	hold off;
+%for t = 1:20:T
+%	subplot(1,2,1);
+%  title(['Poisson-Kac Process, # of reactions ',num2str(t)]);
+%	scatter(X(2,:,t),X(3,:,t),250,"m",".");
+%	set(gca,'Color','k');
+%	hold off;
+%  xlim([0,L]);
+%  ylim([0,L]);
+%	pause(1/5000);
+%	subplot(1,2,2);
+%  title(['Wiener Process, # of reactions ',num2str(t)]);
+%	scatter(Y(2,:,t),Y(3,:,t),250,"c",".");
+%	set(gca,'Color','k');
+%	hold off;
+%  xlim([0,L]);
+%  ylim([0,L]);
+%	pause(1/5000);
+%end
+for t = 1:4
+	subplot(1,4,t);
+	rxn_num = (T / 4) * t;
+	scatter(X(2,:,rxn_num),X(3,:,rxn_num),50,"m",".");
+	title(['Biased Feedback,  # of reactions ', num2str(rxn_num)]);
   xlim([0,L]);
   ylim([0,L]);
-	pause(1/5000);
+	set(gca, 'Color', 'k');
+	set(gcf, 'InvertHardcopy', 'off');
+	axis equal;
 end

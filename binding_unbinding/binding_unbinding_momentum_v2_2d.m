@@ -3,9 +3,9 @@
 % rates: r_bind = k_bind * (1-a)
 % 			 r_unbind = k_unbind * a
 
-N_x = 5000; % The number of molecules
+N_x = 2000; % The number of molecules
 N_x_starting_bound = N_x/10; % The number of molecules
-N_y = 5000; % The number of molecules
+N_y = 2000; % The number of molecules
 N_y_starting_bound = N_y/10; % The number of molecules
 T = 5000; % Number of reactions
 k_bind = 0.00000005; % Binding rate constant
@@ -203,17 +203,40 @@ a_steady_state = 1 - (k_unbind/k_feedback);
 
 %subplot(1,3,3);
 
-ylabel('Y Position');
-xlabel = ('X Position');
-
-for t = 1:20:T
-  title(['Particle Position: ',num2str(t)]);
-	scatter(X(2,:,t),X(3,:,t),250,"m",".");
-	set(gca, 'Color', 'k');
-	hold on;
-	scatter(Y(2,:,t),Y(3,:,t),250,"c",".");
-	hold off;
+%for t = 1:20:T
+%subplot(1,2,1);
+%  title(['Biased Feedback, # of reactions',num2str(t)]);
+%  ylabel('Y Position');
+%  xlabel = ('X Position');
+%	hold off;
+%	scatter(X(2,:,t),X(3,:,t),250,"m",".");
+%	hold off;
+%	set(gca, 'Color', 'k');
+%  xlim([0,L]);
+%  ylim([0,L]);
+%	pause(1/5000);
+%subplot(1,2,2);
+%  title(['Regular Feedback, # of reactions ',num2str(t)]);
+%  ylabel('Y Position');
+%  xlabel = ('X Position');
+%	hold off;
+%	scatter(Y(2,:,t),Y(3,:,t),250,"c",".");
+%	set(gca, 'Color', 'k');
+%  xlim([0,L]);
+%  ylim([0,L]);
+%	pause(1/5000);
+%end
+% -- PLOTTING 4 GRAPHS FOR PAPER --
+for t = 1:4
+	subplot(1,4,t);
+	rxn_num = (5000 / 4) * t;
+	scatter(X(2,:,rxn_num),X(3,:,rxn_num),50,"m",".");
+	title(['Biased Feedback,  # of reactions ', num2str(rxn_num)]);
+	ylabel('Y position');
+	xlabel('X position');
   xlim([0,L]);
   ylim([0,L]);
-	pause(1/5000);
+	set(gca, 'Color', 'k');
+	set(gcf, 'InvertHardcopy', 'off');
+	axis equal;
 end

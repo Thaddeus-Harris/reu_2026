@@ -3,14 +3,14 @@
 % rates: r_bind = k_bind * (1-a)
 % 			 r_unbind = k_unbind * a
 
-N = 500; % The number of molecules
+N = 50; % The number of molecules
 N_bound_start = N / 10; % amount bound at the start
 T = 20000; % Number of reactions
-k_bind = 0.1; % Binding rate constant (Transitions from uniform to clusters at k_bind/k_fee
-k_unbind = 0.9; % Unbinding rate constant
-k_feedback = 1.0; % Feedback rate constant
+k_bind = 0.701; % Binding rate constant (Transitions from uniform to clusters at k_bind/k_fee
+k_unbind = 0.1; % Unbinding rate constant
+%k_feedback = 1.0; % Feedback rate constant
 L = 1; % Length of cell membrane
-v_x = 0.00075; % Velocity for random walk
+v_x = 0.0015; % Velocity for random walk
 p = 0.5; % Probability of moving to the right in random walk (0.5 for no bias)
 
 % X(1,:) is a bool representing whether each particle is bound or not.
@@ -22,7 +22,7 @@ X(2,(N_bound_start+1):N,1) = nan;
 
 unbind_num = 0;
 bind_num = 0; 
-feedback_num = 0;
+%feedback_num = 0;
 
 % A(1, :) is a float representing the proportion of chemical A that is bound.
 % A(2, :) is the time that this value is recorded.
@@ -40,8 +40,8 @@ for i = 2:(T+1)
 	n = sum(X(1,:,i)); % Number of bound particles
 	r_bind = k_bind*(N-n);
 	r_unbind = k_unbind*n;
-	r_feedback = k_feedback*(n/N)*(N - n);
-	r_sum = r_bind + r_unbind + r_feedback;
+	%r_feedback = k_feedback*(n/N)*(N - n);
+	r_sum = r_bind + r_unbind;% + r_feedback;
 
 	% Generating a random number for use in Gillespie Algo
 
@@ -60,16 +60,16 @@ for i = 2:(T+1)
 		X(1,bound_index,i) = 0;
 		X(2,bound_index,i) = nan;
 		unbind_num = unbind_num + 1;
-	else 
-		unbound_list = find(X(1,:,i) == 0);
-		unbound_index = unbound_list(randi(length(unbound_list)));
+%	else 
+%		unbound_list = find(X(1,:,i) == 0);
+%	  unbound_index = unbound_list(randi(length(unbound_list)));
 		
-		bound_list = find(X(1,:,i) == 1);
-		bound_index = bound_list(randi(length(bound_list)));
+%		bound_list = find(X(1,:,i) == 1);
+%		bound_index = bound_list(randi(length(bound_list)));
 
-		X(1,unbound_index,i) = 1;
-		X(2,unbound_index,i) = X(2,bound_index,i);
-		feedback_num = feedback_num + 1;
+	%	X(1,unbound_index,i) = 1;
+	%	X(2,unbound_index,i) = X(2,bound_index,i);
+	%	feedback_num = feedback_num + 1;
 	end
 
 	% Creates masks for bound & unbound values
@@ -122,15 +122,14 @@ end
 %ylabel('Number of Particles');
 
 %subplot(1,3,3);
-
 for n = 1:N
 	hold on;
 	scatter(A(2,:),X(2,n,:),"y",".");
+	set(gcf,'InvertHardcopy','off');
 	set(gca,'Color','k');
 	box on; grid on; 
 end
 title('Particle Trajectory');
 ylabel('X Position');
 xlabel = ('time');
-print('kb=0.1.jpg','jpg')
-unbind_num, bind_num, feedback_num  
+% unbind_num, bind_num, feedback_num  

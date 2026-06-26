@@ -195,12 +195,13 @@ ylabel = ('Y Position');
 xlabel = ('X Position');
 
 for t = 1:20:T
-  title(['Particle Position: ',num2str(t)]);
+  title(['Particle Position, # of Reactions:',num2str(t)]);
+  ylabel = ('Y Position');
+  xlabel = ('X Position');
   set(gca,'Color','k');
 	box on; grid on; axis equal;
-	scatter(X(2,:,t),X(3,:,t),150,"m",".");
+	scatter(X(2,:,t),X(3,:,t),150,"c",".");
 	hold on;
-	scatter(Y(2,:,t),Y(3,:,t),150,"c",".");
   set(gca,'Color','k');
 	box on; grid on; axis equal;
 	hold off;
